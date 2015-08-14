@@ -23,7 +23,7 @@ import javax.print.PrintServiceLookup;
 import javax.print.attribute.AttributeSet;
 import javax.print.attribute.HashAttributeSet;
 import javax.print.attribute.standard.PrinterName;
-import principal.JFrameprincipal;
+import principal.Principal;
 
 /**
  *
@@ -131,7 +131,7 @@ public class Pagina implements Printable {
 //              /* The job did not successfully complete */
 //             }
             } catch (PrinterException ex) {
-                Logger.getLogger(JFrameprincipal.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Pagina.class.getName()).log(Level.SEVERE, null, ex);
             }
 
         }
