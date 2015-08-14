@@ -38,44 +38,12 @@ public class JFrameprincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTAsalida = new javax.swing.JTextArea();
-        jPanel1 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jBImprimir = new javax.swing.JButton();
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Imprimir el contenido de un JText Area");
         setMinimumSize(new java.awt.Dimension(400, 400));
 
-        jTAsalida.setColumns(20);
-        jTAsalida.setRows(5);
-        jScrollPane1.setViewportView(jTAsalida);
-
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
-
-        jPanel2.setLayout(new java.awt.GridLayout(1, 2, 10, 0));
-
-        jBImprimir.setMnemonic('I');
-        jBImprimir.setText("Imprimir");
-        jBImprimir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jBImprimirActionPerformed(evt);
-            }
-        });
-        jPanel2.add(jBImprimir);
-
-        jPanel1.add(jPanel2);
-
-        getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jBImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBImprimirActionPerformed
-        PaginationExample pagination = new PaginationExample();
-        pagination.imprimirnomina();
-    }//GEN-LAST:event_jBImprimirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -92,7 +60,7 @@ public class JFrameprincipal extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Windows".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -119,120 +87,9 @@ public class JFrameprincipal extends javax.swing.JFrame {
         });
     }
 
-    public class PaginationExample implements Printable {
-
-        //Se obtienen las lineas de texto del JTextArea, la linea de texto finaliza cuando se encuentra el caracter de nueva linea \n
-        StringTokenizer lineasdetexto = new StringTokenizer(jTAsalida.getText(), "\n", true);
-        //Se obtiene el total de lineas de texto
-        int totallineas = lineasdetexto.countTokens();
-
-        int[] paginas;  // Arreglo de número de paginas que se necesitaran para imprimir todo el texto 
-
-        String[] textoLineas; //Lineas de texto que se imprimiran en cada hoja
-
-        //Metodo que se crea por default cuando una clase implementa a Printable
-        public int print(Graphics g, PageFormat pf, int pageIndex)
-                throws PrinterException {
-            //Se establece la fuente, el tipo, el tamaño, la metrica según la fuente asignada, 
-            //obtiene la altura de cada linea de texto para que todas queden iguales
-            Font font = new Font("Serif", Font.PLAIN, 8);
-            FontMetrics metrics = g.getFontMetrics(font);
-            int altodelinea = metrics.getHeight();
-            //Calcula el número de lineas por pagina y el total de paginas
-            if (paginas == null) {
-                initTextoLineas();
-                //Calcula las lineas que le caben a cada página dividiendo la altura imprimible entre la altura de la linea de texto
-                int lineasPorPagina = (int) (pf.getImageableHeight() / altodelinea);
-                //Calcula el numero de páginas dividiendo el total de lineas entre el numero de lineas por página
-                int numeroPaginas = (textoLineas.length - 1) / lineasPorPagina;
-                paginas = new int[numeroPaginas];
-                for (int b = 0; b < numeroPaginas; b++) {
-                    paginas[b] = (b + 1) * lineasPorPagina;
-                }
-            }
-            //Si se recibe un indice de página mayor que el total de páginas calculadas entonces 
-            //retorna NO_SUCH_PAGE para indicar que tal pagina no existe 
-            if (pageIndex > paginas.length) {
-                return NO_SUCH_PAGE;
-            }
-            /*Por lo regular cuando dibujamos algun objeto lo coloca en la coordenada (0,0), esta coordenada 
-             * se encuentra fuera del área imprimible, por tal motivo se debe trasladar la posicion de las lineas de texto
-             * según el área imprimible del eje X y el eje Y 
-             */
-
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.translate(pf.getImageableX(), pf.getImageableY());
-            /*Dibujamos cada línea de texto en cada página,
-             * se aumenta a la posición 'y' la altura de la línea a cada línea de texto para evitar la saturación de texto 
-             */
-
-            int y = 0;
-            int start = (pageIndex == 0) ? 0 : paginas[pageIndex - 1];
-            int end = (pageIndex == paginas.length) ? textoLineas.length : paginas[pageIndex];
-            for (int line = start; line < end; line++) {
-                y += altodelinea;
-                g.drawString(textoLineas[line], 0, y);
-            }
-            /* Retorna PAGE_EXISTS para indicar al invocador que esta página es parte del documento impreso
-             */
-            return PAGE_EXISTS;
-        }
-
-        /* Agrega las lineas de texto al arreglo */
-        public void initTextoLineas() {
-            if (textoLineas == null) {
-                int numLineas = totallineas;
-                textoLineas = new String[numLineas];
-                //Se llena el arreglo que contiene todas las lineas de texto
-                while (lineasdetexto.hasMoreTokens()) {
-                    for (int i = 0; i < numLineas; i++) {
-                        textoLineas[i] = lineasdetexto.nextToken();
-                    }
-                }
-            }
-        }
-
-        //Este metodo crea un objeto Printerjob el cual es inicializado y asociado con la impresora por default
-        public void imprimirnomina() {
-
-            try {
-                PrinterJob job = PrinterJob.getPrinterJob();
-                job.setPrintable(this);
-                //Si el usuario presiona imprimir en el dialogo de impresión,
-                //entonces intenta imprimir todas las lineas de texto
-                String printName = "EPSON TM-U220";
-                //String printName = "Microsoft XPS Document Writer";
-//aqui creo un arreglo para obtener todas las impresoras que tengo instaladas
-                PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
-                
-                //aqui le digo con que impresora voy a trabajar
-                AttributeSet aset = new HashAttributeSet();
-                aset.add(new PrinterName(printName, null));
-                services = PrintServiceLookup.lookupPrintServices(null, aset);
-                job.setPrintService(services[0]);
-                job.setJobName("Cliente");
-                job.print();
-                // boolean ok = job.printDialog();
-//         if (ok) {
-//             try {
-//                 
-//                  job.print();
-//             } catch (PrinterException ex) {
-//              /* The job did not successfully complete */
-//             }
-            } catch (PrinterException ex) {
-                Logger.getLogger(JFrameprincipal.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-
-    }
+    
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jBImprimir;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTAsalida;
     // End of variables declaration//GEN-END:variables
 }
